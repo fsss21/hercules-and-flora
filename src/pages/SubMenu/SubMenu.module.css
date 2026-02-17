@@ -1,0 +1,285 @@
+.subMenu {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 40px 20px;
+  padding-top: 100px;
+  color: #fff;
+  overflow: hidden;
+}
+
+.subMenuBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.subMenuContent {
+  padding-top: 40px;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.subMenuCenterText {
+  text-align: center;
+  margin-bottom: 60px;
+  padding: 0 20px;
+}
+
+
+.subMenuCenterText h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subMenuCenterText p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Стили для страницы С фото */
+.subMenuMainContent {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: stretch;
+  margin-top: 20px;
+  height: calc(100vh - 300px);
+  min-height: 500px;
+  width: 100%;
+}
+
+.subMenuMainContentMenu {
+  display: flex;
+  width: 700px;
+  padding: 20px;
+}
+
+.subMenuTextBlock {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.subMenuBottomNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: absolute;
+  width: 100%;
+  max-width: 600px;
+  bottom: 2%;
+}
+
+* button{
+  font-family: 'Anticva', serif;
+}
+
+.controlsNavMenu{
+  display: flex;
+  gap: 15px;
+}
+
+.subMenuTextBlock h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: #522C02;
+  font-family: 'Anticva', serif;
+}
+
+.subMenuTextBlock p {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #000000;
+  font-family: 'Raleway-v4020', serif;
+}
+
+.subMenuTextBlock p:last-child {
+  margin-bottom: 0;
+}
+
+.subMenuTextNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.subMenuTextNavBtn {
+  background: rgb(189, 89, 46, 22%);
+  color: #BD592E;
+  border: none;
+  box-shadow: 6px 6px 1px -2px rgba(190, 190, 190, 1), -20px -20px 60px 0px rgba(255, 255, 255, 1);
+  border-radius: 2px;
+  width: 45px;
+  height: 45px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.subMenuTextNavBtn:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.subMenuTextNavBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subMenuTextCounter {
+  font-size: 16px;
+  color: #BD592E;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: center;
+}
+
+.subMenuTextPoint {
+  text-transform: uppercase;
+}
+
+/* Стили для страницы С фото */
+.subMenuGalleryBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 900px;
+}
+
+.subMenuGalleryWrapper {
+  width: 100%;
+  max-width: 800px;
+}
+
+.subMenuGalleryWrapper :global(div[class*="photoGallery"]) {
+  max-width: 800px;
+}
+
+.subMenuGalleryWrapper :global(div[class*="photoGalleryContainer"]) {
+  min-height: 400px;
+  max-height: 500px;
+}
+
+.subMenuGalleryControls{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 800px;
+}
+
+.subMenuNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.fullscreenButton{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 45px;
+  background: none;
+  border: none;
+  color: #BFA282;
+  cursor: pointer;
+}
+
+.subMenuGalleryNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #BFA282;
+  border-radius: 50%;
+  border: 1px solid #BFA282;
+  background: none;
+  width: 45px;
+  height: 45px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.subMenuGalleryNavBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.subMenuGalleryNavBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subMenuGalleryCounter {
+  font-size: 16px;
+  color: #BFA282;
+  font-weight: 500;
+  min-width: 80px;
+  text-align: center;
+  font-family: 'Raleway-v4020', serif;
+}
+
+.subMenuBtn {
+  padding: 12px 24px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.subMenuBtnBack {
+  background: rgb(189, 89, 46, 22%);
+  box-shadow: 6px 6px 1px -2px rgba(190, 190, 190, 1), -20px -20px 60px 0px rgba(255, 255, 255, 1);
+  color: #BD592E;
+  border: none;
+  border-radius: 2px;
+}
+
+.subMenuBtnBack:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 968px) {
+  .subMenuMainContent {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .subMenuTextBlock {
+    flex: none;
+  }
+
+  .subMenuGalleryBlock {
+    flex: none;
+  }
+
+  .subMenuCenterText h1 {
+    font-size: 2rem;
+  }
+
+  .subMenuCenterText p {
+    font-size: 1rem;
+  }
+}

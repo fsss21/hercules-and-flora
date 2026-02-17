@@ -1,0 +1,292 @@
+@font-face {
+  font-family: 'Anticva';
+  src: url('https://cdn.jsdelivr.net/gh/KonstatinKrastev/Anticva-Font@main/fonts/Anticva-Regular.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/KonstatinKrastev/Anticva-Font@main/fonts/Anticva-Regular.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/gh/KonstatinKrastev/Anticva-Font@main/fonts/Anticva-Regular.ttf') format('truetype'),
+       url('/fonts/Anticva-Regular.woff2') format('woff2'),
+       url('/fonts/Anticva-Regular.woff') format('woff'),
+       url('/fonts/Anticva-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.catalogItemPage {
+  min-height: 100vh;
+  padding: 40px 20px;
+  padding-top: 100px;
+  color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Raleway-v4020', serif !important;
+}
+
+.catalogItemBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center 20%;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.catalogItemContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  padding-top: 60px;
+}
+
+.catalogItemBackLink {
+  margin-top: 16px;
+  padding: 10px 20px;
+  font-family: 'Anticva', serif;
+  font-size: 16px;
+  color: #CBB293;
+  background: rgba(203, 178, 147, 0.2);
+  border: 1px solid #CBB293;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.catalogItemBackLink:hover {
+  background: rgba(203, 178, 147, 0.35);
+}
+
+.catalogItemMain {
+  display: flex;
+  justify-content: space-around;
+  gap: 30px;
+  align-items: stretch;
+  min-height: calc(100vh - 200px);
+}
+
+/* Левая колонка - текст (35-40% ширины) */
+.catalogItemTextBlock {
+  flex: 0 0 35%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 30px;
+  color: #221102;
+  min-height: 600px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.catalogItemName {
+  font-family: 'Anticva', serif !important;
+  font-size: 2rem;
+  color: #221102;
+  margin-bottom: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.catalogItemInfoRow {
+  display: flex;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.catalogItemInfoLabel {
+  font-family: 'Anticva', serif !important;
+  font-weight: 600;
+  color: #221102;
+  min-width: 140px;
+}
+
+.catalogItemInfoValue {
+  font-family: 'Anticva', serif !important;
+  color: #221102;
+  flex: 1;
+}
+
+.catalogItemDescription {
+  font-family: 'Anticva', serif !important;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #221102;
+  text-align: left;
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.catalogItemDescription p {
+  margin-bottom: 12px;
+}
+
+.catalogItemDescription p:last-child {
+  margin-bottom: 0;
+}
+
+/* Навигация текста */
+.catalogItemTextNavigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid rgba(147, 137, 110, 0.3);
+}
+
+.catalogItemTextCounter {
+  font-family: 'Anticva', serif !important;
+  font-size: 18px;
+  color: #666;
+}
+
+.catalogItemTextArrows {
+  display: flex;
+  gap: 10px;
+}
+
+.catalogItemTextNavBtn {
+  background: none;
+  color: #312916;
+  border: none;
+  border-radius: 4px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Anticva', serif;
+}
+
+.catalogItemTextNavBtn:hover:not(:disabled) {
+  background: rgba(147, 137, 110, 0.3);
+  transform: scale(1.1);
+}
+
+.catalogItemTextNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Правая колонка - фото (60-65% ширины) */
+.catalogItemPhotoBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1050px;
+  margin-right: 20px;
+  min-width: 0;
+}
+
+.catalogItemGallery {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 30px;
+  min-height: 500px;
+}
+
+/* Увеличиваем размер фото на странице предмета */
+.catalogItemGallery > div {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.catalogItemGallery > div > div {
+  width: 100% !important;
+  min-height: 450px !important;
+  max-height: 550px !important;
+  aspect-ratio: auto !important;
+}
+
+/* Навигация фото */
+.catalogItemPhotoNavigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.catalogItemPhotoNavBtn {
+  background: none;
+  color: #BFA282;
+  border: 1px solid #BFA282; 
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Anticva', serif;
+}
+
+.catalogItemPhotoNavBtn:hover:not(:disabled) {
+  transform: scale(1.1);
+}
+
+.catalogItemPhotoNavBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.catalogItemPhotoCounter {
+  font-family: 'Anticva', serif !important;
+  font-size: 18px;
+  color: #BFA282;
+  min-width: 80px;
+  text-align: center;
+}
+
+.catalogItemFullscreenBtn {
+  background: none;
+  color: #BFA282;
+  border: none;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  font-family: 'Anticva', serif;
+}
+
+.catalogItemFullscreenBtn:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 968px) {
+  .catalogItemMain {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .catalogItemTextBlock {
+    flex: none;
+  }
+
+  .catalogItemPhotoBlock {
+    flex: none;
+  }
+
+  .catalogItemName {
+    font-size: 1.5rem;
+  }
+}

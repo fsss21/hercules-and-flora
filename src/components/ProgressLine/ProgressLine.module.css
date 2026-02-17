@@ -1,0 +1,150 @@
+.progressLine {
+  width: 100%;
+  padding: 20px 0;
+  min-height: 100px;
+  height: 100px;
+  position: relative;
+  overflow: visible;
+}
+
+.progressLineLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.progressLineLine::before {
+  content: '';
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #FFFBEF;
+  z-index: 1;
+  transform: translateY(-50%);
+}
+
+.progressLinePoint {
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  transition: all 0.3s ease;
+  flex: 1;
+  min-height: 100px;
+  height: 100px;
+}
+
+.progressLinePointActive {
+  transition: all 0.3s ease;
+}
+
+/* Участок линии под активным label — цвет выделяется, по бокам видна линия */
+.progressLinePointActive::before {
+  content: '';
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  width: min(490px, 100%);
+  height: 2px;
+  background: #BD592E;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+
+/* Обёртка для label: в активном состоянии больше и с фоном-полукругом */
+.progressLineLabelWrap,
+.progressLineLabelWrapActive {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.3s ease;
+}
+
+.progressLineLabelWrap {
+  top: -60px;
+}
+
+.progressLineLabelWrapActive {
+  top: -73px;
+  width: 500px;
+  min-height: 155px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 28px;
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+/* Фон-полукруг — растягиваем по обёртке, чтобы был больше */
+.progressLineLabelBg {
+  position: absolute;
+  opacity: 0.8;
+  inset: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 0;
+}
+
+.progressLineLabel {
+  position: relative;
+  z-index: 1;
+  max-width: 400px;
+  min-height: 40px;
+  background: transparent;
+  color: #FFFBEF;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 17px;
+  text-transform: uppercase;
+  text-align: center;
+  transition: all 0.3s ease;
+  word-wrap: break-word;
+  white-space: normal;
+  width: max-content;
+  font-family: 'Anticva', serif;
+  border: 1px solid transparent;
+}
+
+.progressLinePointActive .progressLineLabel {
+  border: none;
+  color: #522C02;
+  max-width: 480px;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.progressLineDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #FFFBEF;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+}
+
+.progressLinePointActive .progressLineDot {
+  width: 22px;
+  height: 22px;
+  background: #BD592E;
+  transform: translate(-50%, -50%);
+}
+

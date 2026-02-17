@@ -1,0 +1,25 @@
+[
+    {
+      "id": 1,
+      "label": "Техники реставрации мрамора",
+      "progressLineLabel": "Техники <br/> реставрации мрамора",
+      "texts": ["sectionText"],
+      "photos": []
+    },
+    {
+      "id": 2,
+      "label": "климат и скульптура",
+      "progressLineLabel": "климат и скульптура",
+      "texts": ["sectionText"],
+      "photos": []
+    },
+    {
+      "id": 3,
+      "label": "Александровский сад: история и современность",
+      "progressLineLabel": "александровский сад: <br/> история и современность",
+      "texts": ["sectionText.",
+                "text"
+    ],
+      "photos": []
+    }
+  ]
