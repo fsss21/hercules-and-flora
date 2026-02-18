@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "server": "node src/server/index.js",
+    "build:server:win": "npm run build && node -e \"try { require('fs').unlinkSync('build/launch.exe'); } catch (e) {}\" && pkg src/server/index.js --targets node18-win-x64 --output build/launch.exe --config package.json",
+    "build:server:mac": "npm run build && node -e \"try { require('fs').unlinkSync('build/server'); } catch (e) {}\" && pkg src/server/index.js --targets node18-macos-x64 --output build/server --config package.json",
+    "build:win": "npm run build && npm run build:server:win",
+    "build:mac": "npm run build && npm run build:server:mac",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -15,10 +20,24 @@
     "@mui/material": "^5.15.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.0"
+    "react-router-dom": "^6.21.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "pkg": "^5.8.1"
+  },
+  "pkg": {
+    "scripts": [
+      "src/server/index.js",
+      "src/server/utils/serverSetup.js"
+    ],
+    "assets": [
+      "build/**/*"
+    ],
+    "outputPath": "build"
   }
 }

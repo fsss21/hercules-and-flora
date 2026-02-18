@@ -1,0 +1,458 @@
+// Диагностическая информация при запуске
+console.log('🚀 Инициализация сервера...');
+console.log('Node version:', process.version);
+console.log('Platform:', process.platform);
+console.log('Working directory:', process.cwd());
+console.log('Exec path:', process.execPath);
+console.log('Is PKG:', typeof process.pkg !== 'undefined');
+
+// Загрузка модулей
+let express, cors, fs, path, ServerSetup;
+
+try {
+  express = require('express');
+  cors = require('cors');
+  fs = require('fs-extra');
+  path = require('path');
+  ServerSetup = require('./utils/serverSetup');
+  console.log('✅ Все модули загружены успешно');
+} catch (error) {
+  console.error('❌ Ошибка загрузки модулей:', error.message);
+  console.error('Stack:', error.stack);
+  console.log('\n⚠️  Окно закроется через 30 секунд...');
+  setTimeout(() => process.exit(1), 30000);
+  // Блокируем дальнейшее выполнение
+  while(true) {
+    // Ждем закрытия
+  }
+}
+
+// Обработка необработанных ошибок для предотвращения немедленного закрытия
+process.on('uncaughtException', (error) => {
+  console.error('\n❌ Необработанная ошибка:', error.message);
+  console.error('Stack trace:', error.stack);
+  console.error('\nПодробности ошибки:', error);
+  
+  // Пауза перед закрытием (особенно важно для Windows exe)
+  console.log('\n⚠️  Окно закроется через 30 секунд...');
+  setTimeout(() => {
+    process.exit(1);
+  }, 30000);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('\n❌ Необработанное отклонение промиса:', reason);
+  if (reason && reason.stack) {
+    console.error('Stack trace:', reason.stack);
+  }
+  console.log('\n⚠️  Окно закроется через 30 секунд...');
+  setTimeout(() => {
+    process.exit(1);
+  }, 30000);
+});
+
+const app = express();
+
+// Инициализация ServerSetup для управления путями, запуском сервера и браузера
+let serverSetup;
+try {
+  serverSetup = new ServerSetup();
+  console.log('✅ ServerSetup инициализирован');
+} catch (error) {
+  console.error('❌ Ошибка инициализации ServerSetup:', error);
+  console.error('Stack:', error.stack);
+  console.log('\n⚠️  Окно закроется через 30 секунд...');
+  setTimeout(() => process.exit(1), 30000);
+  while(true) {}
+}
+
+// Переменные для хранения путей к файлам данных
+let GAME_ITEMS_FILE = null;
+let STATISTICS_FILE = null;
+let TINDER_VOTES_FILE = null;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Инициализация файлов данных
+async function initializeData() {
+  try {
+    // Проверяем, что методы доступны
+    if (!serverSetup || typeof serverSetup.getGameItemsFile !== 'function') {
+      throw new Error(`serverSetup.getGameItemsFile is not a function. Type: ${typeof serverSetup?.getGameItemsFile}`);
+    }
+    if (typeof serverSetup.getStatisticsFile !== 'function') {
+      throw new Error(`serverSetup.getStatisticsFile is not a function. Type: ${typeof serverSetup?.getStatisticsFile}`);
+    }
+    
+    console.log('🔍 Вызов getGameItemsFile...');
+    // Получаем пути к файлам данных (с проверкой существования)
+    GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    console.log('🔍 Вызов getStatisticsFile...');
+    STATISTICS_FILE = await serverSetup.getStatisticsFile();
+    
+    // Проверяем, что пути получены
+    if (!GAME_ITEMS_FILE || !STATISTICS_FILE) {
+      throw new Error(`Не удалось получить пути к файлам данных. GAME_ITEMS_FILE: ${GAME_ITEMS_FILE}, STATISTICS_FILE: ${STATISTICS_FILE}`);
+    }
+    
+    await serverSetup.initializeDataDir();
+
+    const tinderVotesFile = await serverSetup.getTinderVotesFile();
+    if (tinderVotesFile) {
+      TINDER_VOTES_FILE = tinderVotesFile;
+      const tinderVotesExists = await fs.pathExists(TINDER_VOTES_FILE);
+      if (!tinderVotesExists) {
+        await fs.ensureDir(path.dirname(TINDER_VOTES_FILE));
+        await fs.writeJson(TINDER_VOTES_FILE, {}, { spaces: 2 });
+        console.log('✅ Создан файл tinderVotes.json');
+      }
+    }
+
+    // Проверяем существование файлов и создаем, если их нет
+    const gameItemsExists = await fs.pathExists(GAME_ITEMS_FILE);
+    if (!gameItemsExists) {
+      await fs.writeJson(GAME_ITEMS_FILE, [], { spaces: 2 });
+      console.log('✅ Создан пустой catalogItems.json (добавьте данные в public/data/catalogItems.json и пересоберите)');
+    }
+
+    const statisticsExists = await fs.pathExists(STATISTICS_FILE);
+    if (!statisticsExists) {
+      await fs.writeJson(STATISTICS_FILE, [], { spaces: 2 });
+      console.log('✅ Создан пустой progressPoints.json');
+    }
+  } catch (error) {
+    console.error('❌ Ошибка инициализации данных:', error);
+  }
+}
+
+// ==================== API для игровых предметов ====================
+
+// GET /api/items - получить все включенные предметы
+app.get('/api/items', async (req, res) => {
+  try {
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    const exists = await fs.pathExists(GAME_ITEMS_FILE);
+    if (exists) {
+      const items = await fs.readJson(GAME_ITEMS_FILE);
+      // Возвращаем только включенные предметы
+      const enabledItems = Array.isArray(items) ? items.filter(item => item.enabled !== false) : [];
+      res.json(enabledItems);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error('Ошибка чтения gameItems:', error);
+    res.status(500).json({ error: 'Не удалось загрузить предметы' });
+  }
+});
+
+// GET /api/items/all - получить все предметы (включая отключенные) для админки
+app.get('/api/items/all', async (req, res) => {
+  try {
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    const exists = await fs.pathExists(GAME_ITEMS_FILE);
+    if (exists) {
+      const items = await fs.readJson(GAME_ITEMS_FILE);
+      res.json(Array.isArray(items) ? items : []);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error('Ошибка чтения gameItems:', error);
+    res.status(500).json({ error: 'Не удалось загрузить предметы' });
+  }
+});
+
+// POST /api/items - создать новый предмет
+app.post('/api/items', async (req, res) => {
+  try {
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    if (GAME_ITEMS_FILE) {
+      await fs.ensureDir(path.dirname(GAME_ITEMS_FILE));
+    }
+    
+    let items = [];
+    if (GAME_ITEMS_FILE && await fs.pathExists(GAME_ITEMS_FILE)) {
+      items = await fs.readJson(GAME_ITEMS_FILE);
+    }
+    
+    const newItem = {
+      id: Math.max(...items.map(m => m.id || 0), 0) + 1,
+      enabled: req.body.enabled !== undefined ? req.body.enabled : true,
+      ...req.body
+    };
+    
+    items.push(newItem);
+    await fs.writeJson(GAME_ITEMS_FILE, items, { spaces: 2 });
+    
+    res.json(newItem);
+  } catch (error) {
+    console.error('Ошибка создания предмета:', error);
+    res.status(500).json({ error: 'Не удалось создать предмет' });
+  }
+});
+
+// PUT /api/items/:id - обновить предмет
+app.put('/api/items/:id', async (req, res) => {
+  try {
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    const exists = await fs.pathExists(GAME_ITEMS_FILE);
+    if (!exists) {
+      return res.status(404).json({ error: 'Файл предметов не найден' });
+    }
+    
+    const items = await fs.readJson(GAME_ITEMS_FILE);
+    const id = parseInt(req.params.id);
+    const index = items.findIndex(m => m.id === id);
+    
+    if (index === -1) {
+      return res.status(404).json({ error: 'Предмет не найден' });
+    }
+    
+    items[index] = { ...items[index], ...req.body, id };
+    await fs.writeJson(GAME_ITEMS_FILE, items, { spaces: 2 });
+    
+    res.json(items[index]);
+  } catch (error) {
+    console.error('Ошибка обновления предмета:', error);
+    res.status(500).json({ error: 'Не удалось обновить предмет' });
+  }
+});
+
+// DELETE /api/items/:id - удалить предмет
+app.delete('/api/items/:id', async (req, res) => {
+  try {
+    if (!GAME_ITEMS_FILE) {
+      GAME_ITEMS_FILE = await serverSetup.getGameItemsFile();
+    }
+    
+    const exists = await fs.pathExists(GAME_ITEMS_FILE);
+    if (!exists) {
+      return res.status(404).json({ error: 'Файл предметов не найден' });
+    }
+    
+    const items = await fs.readJson(GAME_ITEMS_FILE);
+    const id = parseInt(req.params.id);
+    const filteredItems = items.filter(m => m.id !== id);
+    
+    if (filteredItems.length === items.length) {
+      return res.status(404).json({ error: 'Предмет не найден' });
+    }
+    
+    // Удаляем статистику для этого предмета
+    if (STATISTICS_FILE) {
+      const statsExists = await fs.pathExists(STATISTICS_FILE);
+      if (statsExists) {
+        const stats = await fs.readJson(STATISTICS_FILE);
+        const filteredStats = stats.filter(s => s.itemId !== id);
+        await fs.writeJson(STATISTICS_FILE, filteredStats, { spaces: 2 });
+      }
+    }
+    
+    await fs.writeJson(GAME_ITEMS_FILE, filteredItems, { spaces: 2 });
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Ошибка удаления предмета:', error);
+    res.status(500).json({ error: 'Не удалось удалить предмет' });
+  }
+});
+
+// ==================== API для статистики ====================
+
+// GET /api/statistics - получить всю статистику
+app.get('/api/statistics', async (req, res) => {
+  try {
+    if (!STATISTICS_FILE) {
+      STATISTICS_FILE = await serverSetup.getStatisticsFile();
+    }
+    
+    const exists = await fs.pathExists(STATISTICS_FILE);
+    if (exists) {
+      const statistics = await fs.readJson(STATISTICS_FILE);
+      res.json(Array.isArray(statistics) ? statistics : []);
+    } else {
+      res.json([]);
+    }
+  } catch (error) {
+    console.error('Ошибка чтения статистики:', error);
+    res.status(500).json({ error: 'Не удалось загрузить статистику' });
+  }
+});
+
+// ==================== API для Tinder-голосования ====================
+
+// GET /api/tinder/votes (в проекте hercules-and-flora отключено)
+app.get('/api/tinder/votes', async (req, res) => {
+  if (!TINDER_VOTES_FILE) {
+    return res.status(404).json({ error: 'Недоступно в этом проекте' });
+  }
+  try {
+    const exists = await fs.pathExists(TINDER_VOTES_FILE);
+    if (exists) {
+      const data = await fs.readJson(TINDER_VOTES_FILE);
+      res.json(typeof data === 'object' && !Array.isArray(data) ? data : {});
+    } else {
+      res.json({});
+    }
+  } catch (error) {
+    console.error('Ошибка чтения tinder votes:', error);
+    res.status(500).json({ error: 'Не удалось загрузить голоса' });
+  }
+});
+
+// POST /api/tinder/vote (в проекте hercules-and-flora отключено)
+app.post('/api/tinder/vote', async (req, res) => {
+  if (!TINDER_VOTES_FILE) {
+    return res.status(404).json({ error: 'Недоступно в этом проекте' });
+  }
+  try {
+    await fs.ensureDir(path.dirname(TINDER_VOTES_FILE));
+    let votes = {};
+    if (await fs.pathExists(TINDER_VOTES_FILE)) {
+      const data = await fs.readJson(TINDER_VOTES_FILE);
+      votes = typeof data === 'object' && !Array.isArray(data) ? data : {};
+    }
+    const itemId = parseInt(req.body.itemId, 10);
+    if (!Number.isInteger(itemId) || itemId < 1) {
+      return res.status(400).json({ error: 'Некорректный itemId' });
+    }
+    const key = String(itemId);
+    votes[key] = (votes[key] || 0) + 1;
+    await fs.writeJson(TINDER_VOTES_FILE, votes, { spaces: 2 });
+    res.json({ itemId, votes: votes[key] });
+  } catch (error) {
+    console.error('Ошибка сохранения голоса:', error);
+    res.status(500).json({ error: 'Не удалось сохранить голос' });
+  }
+});
+
+// POST /api/statistics - сохранить статистику ответа
+app.post('/api/statistics', async (req, res) => {
+  try {
+    if (!STATISTICS_FILE) {
+      STATISTICS_FILE = await serverSetup.getStatisticsFile();
+    }
+    
+    await fs.ensureDir(path.dirname(STATISTICS_FILE));
+    
+    let statistics = [];
+    if (await fs.pathExists(STATISTICS_FILE)) {
+      statistics = await fs.readJson(STATISTICS_FILE);
+    }
+    
+    const { itemId, selectedAnswer, isCorrect } = req.body;
+    
+    // Ищем существующую запись для этого предмета
+    let statEntry = statistics.find(s => s.itemId === itemId);
+    
+    if (statEntry) {
+      statEntry.totalAnswers = (statEntry.totalAnswers || 0) + 1;
+      statEntry.correctAnswers = (statEntry.correctAnswers || 0) + (isCorrect ? 1 : 0);
+      
+      if (!statEntry.answerStats) {
+        statEntry.answerStats = {};
+      }
+      const answerKey = `option_${selectedAnswer}`;
+      statEntry.answerStats[answerKey] = (statEntry.answerStats[answerKey] || 0) + 1;
+      
+      statEntry.accuracy = ((statEntry.correctAnswers / statEntry.totalAnswers) * 100).toFixed(2);
+    } else {
+      statEntry = {
+        itemId,
+        totalAnswers: 1,
+        correctAnswers: isCorrect ? 1 : 0,
+        answerStats: {
+          [`option_${selectedAnswer}`]: 1
+        },
+        accuracy: isCorrect ? '100.00' : '0.00'
+      };
+      statistics.push(statEntry);
+    }
+    
+    await fs.writeJson(STATISTICS_FILE, statistics, { spaces: 2 });
+    
+    res.json(statEntry);
+  } catch (error) {
+    console.error('Ошибка сохранения статистики:', error);
+    res.status(500).json({ error: 'Не удалось сохранить статистику' });
+  }
+});
+
+// Настройка статических файлов через ServerSetup
+serverSetup.setupStaticFiles(app, express);
+
+// Запуск сервера
+async function startServer() {
+  try {
+    console.log('🚀 Запуск сервера...');
+    await initializeData();
+
+    await serverSetup.startServer(app, async () => {
+      const buildDir = serverSetup.getBuildDir();
+      console.log(`✅ Сервер готов к работе`);
+      if (GAME_ITEMS_FILE) {
+        console.log(`📁 Данные в: ${path.dirname(GAME_ITEMS_FILE)}`);
+      } else {
+        const dataPath = await serverSetup.getGameItemsFile();
+        console.log(`📁 Данные в: ${path.dirname(dataPath)}`);
+      }
+    });
+  } catch (error) {
+    console.error('❌ Критическая ошибка при запуске сервера:', error);
+    console.error('Stack trace:', error.stack);
+    
+    // Пауза перед закрытием
+    console.log('\n⚠️  Окно закроется через 30 секунд или нажмите любую клавишу...');
+    if (process.stdin.isTTY) {
+      try {
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.once('data', () => process.exit(1));
+      } catch (e) {
+        // Если не удалось настроить stdin
+      }
+    }
+    setTimeout(() => {
+      process.exit(1);
+    }, 30000);
+  }
+}
+
+startServer().catch((error) => {
+  console.error('❌ Ошибка при запуске:', error);
+  console.error('Stack trace:', error.stack);
+  
+  // Пауза перед закрытием
+    console.log('\n⚠️  Окно закроется через 30 секунд или нажмите любую клавишу...');
+    if (process.stdin.isTTY) {
+      try {
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.once('data', () => process.exit(1));
+      } catch (e) {
+        // Если не удалось настроить stdin, просто ждем
+      }
+    }
+    setTimeout(() => {
+      process.exit(1);
+    }, 30000);
+});
