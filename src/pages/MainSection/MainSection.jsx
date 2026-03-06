@@ -84,6 +84,11 @@ function MainSection() {
           </button>
         </div>
 
+        <div className={styles.mainSectionBottom}>
+          <button type="button" className={styles.mainSectionBackBtn} onClick={handleBack}>
+            Назад
+          </button>
+        </div>
       </div>
     </div>
   )

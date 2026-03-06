@@ -80,6 +80,11 @@ function Catalog() {
         style={{ backgroundImage: `url(${imageSrc})` }}
       />
       <div className={styles.catalogContent}>
+        <div className={styles.catalogBottomNavigation}>
+          <button type="button" className={styles.catalogBackBtn} onClick={handleBack}>
+            Назад
+          </button>
+        </div>
         <div className={styles.catalogCenter}>
           {items.length === 0 ? (
             <p className={styles.catalogEmpty}>
@@ -100,7 +105,7 @@ function Catalog() {
                 <button
                   type="button"
                   className={`${styles.catalogCard} ${styles.catalogCardSide}`}
-                  onClick={() => handleItemClick(prevItem)}
+
                 >
                   <div className={styles.catalogCardImage}>
                     <img src={getItemImage(prevItem)} alt="" />
@@ -132,7 +137,7 @@ function Catalog() {
                 <button
                   type="button"
                   className={`${styles.catalogCard} ${styles.catalogCardSide}`}
-                  onClick={() => handleItemClick(nextItem)}
+
                 >
                   <div className={styles.catalogCardImage}>
                     <img src={getItemImage(nextItem)} alt="" />
