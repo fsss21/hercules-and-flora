@@ -67,7 +67,7 @@ function Catalog() {
     navigate(`/catalog/${item.id}`)
   }
 
-  const handleBack = () => navigate('/')
+  const handleBack = () => navigate('/main-section')
 
   const prevItem = items[prevIndex] ?? null
   const currentItem = items[currentItemIndex] ?? null
