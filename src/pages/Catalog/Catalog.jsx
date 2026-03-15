@@ -15,11 +15,23 @@ function getItemImage(item) {
 function getItemDescription(item) {
   if (!item) return ''
   const parts = []
-  if (item.sculptor) parts.push(item.sculptor)
-  if (item.creationTime) parts.push(item.creationTime)
-  if (item.material) parts.push(item.material)
-  if (parts.length) return parts.join('. ')
-  if (item.texts?.[0]) return item.texts[0].slice(0, 120) + (item.texts[0].length > 120 ? '…' : '')
+  if (item.sculptor) {
+    const short = item.sculptor.split(/[,(]/)[0].trim()
+    parts.push(short.length > 40 ? short.slice(0, 40) + '…' : short)
+  }
+  if (item.creationTime) {
+    const t = item.creationTime
+    parts.push(t.length > 35 ? t.slice(0, 35) + '…' : t)
+  }
+  if (item.material) {
+    const m = item.material.split(',')[0].trim()
+    parts.push(m.length > 30 ? m.slice(0, 30) + '…' : m)
+  }
+  if (parts.length) return parts.join(' · ')
+  if (item.texts?.[0]) {
+    const plain = item.texts[0].replace(/<[^>]+>/g, '')
+    return plain.slice(0, 80) + (plain.length > 80 ? '…' : '')
+  }
   return ''
 }
 

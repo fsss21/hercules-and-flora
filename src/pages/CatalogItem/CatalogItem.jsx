@@ -134,9 +134,7 @@ function CatalogItem() {
               className={styles.catalogItemDescription}
               dangerouslySetInnerHTML={{ __html: `<p>${currentTexts[currentTextIndex] || ''}</p>` }}
             />
-            <button type="button" className={styles.catalogItemBackLink} onClick={handleBack}>
-              Назад
-            </button>
+
             {/* Навигация текста */}
             {currentTexts.length > 1 && (
               <div className={styles.catalogItemTextNavigation}>
@@ -161,7 +159,9 @@ function CatalogItem() {
                     <ArrowForwardIosIcon />
                   </button>
                 </div>
-
+                <button type="button" className={styles.catalogItemBackLink} onClick={handleBack}>
+                  Назад
+                </button>
               </div>
             )}
           </div>
